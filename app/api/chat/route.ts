@@ -69,3 +69,9 @@ export async function POST(req: Request) {
 
   return new StreamingTextResponse(stream)
 }
+const prompt = `
+You are a helpful assistant. Please provide the following information for jewellery and retail shops:
+1. Headquarter address
+2. Contact information
+3. LinkedIn address of the person to reach out to
+`
