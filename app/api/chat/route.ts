@@ -42,27 +42,30 @@ export async function POST(req: Request) {
     stream: true
   })
 
-  const stream = OpenAIStream(res, {
-    prompt,
+const stream = OpenAIStream(res, {
     async onCompletion(completion) {
       const title = json.messages[0].content.substring(0, 100)
       const id = json.id ?? nanoid()
       const createdAt = Date.now()
       const path = `/chat/${id}`
+      const companyName = json.companyName || 'Unknown Company';
       const payload = {
-        id,
-        title,
-        userId,
-        createdAt,
-        path,
-        messages: [
-          ...messages,
-          {
-            content: completion,
-            role: 'assistant'
-          }
-        ]
-      }
+              id,
+              title,
+              userId,
+              createdAt,
+              path,
+              messages: [
+                ...messages,
+                {
+                  content: `You are a helpful assistant. Please provide the following information for the company "${companyName}":
+                            1. Headquarter address
+                            2. Contact information
+                            3. LinkedIn address of the person to reach out to`,
+                  role: 'system'
+                }
+              ]
+            }
       // Insert chat into database.
       await supabase.from('chats').upsert({ id, payload }).throwOnError()
     }
@@ -70,9 +73,3 @@ export async function POST(req: Request) {
 
   return new StreamingTextResponse(stream)
 }
-const prompt = `
-You are a helpful assistant. Please provide the following information for jewellery and retail shops:
-1. Headquarter address
-2. Contact information
-3. LinkedIn address of the person to reach out to
-`
