@@ -43,6 +43,7 @@ export async function POST(req: Request) {
   })
 
   const stream = OpenAIStream(res, {
+    prompt,
     async onCompletion(completion) {
       const title = json.messages[0].content.substring(0, 100)
       const id = json.id ?? nanoid()
